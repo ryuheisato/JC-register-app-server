@@ -2,8 +2,10 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
+
 
 datasource db {
   provider = "postgresql"
@@ -20,26 +22,37 @@ model Semester {
 model Member {
   id        Int           @id @default(autoincrement())
   name      String
-  studentID String        @unique
+  studentID String
   semesters SemesterMember[]
-  eventsAttended Event[] @relation("EventAttendees")
+  eventsAttended EventAttendance[]
 }
 
 model SemesterMember {
   semesterId Int
   memberId   Int
+  studentID  String
   semester   Semester @relation(fields: [semesterId], references: [id])
   member     Member   @relation(fields: [memberId], references: [id])
 
   @@id([semesterId, memberId])
+  @@unique([semesterId, studentID])
 }
 
+
 model Event {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String
   date        DateTime
   description String?
-  attendees   Member[] @relation("EventAttendees")
-  semester    Semester @relation(fields: [semesterId], references: [id])
+  attendees   EventAttendance[]
+  semester    Semester       @relation(fields: [semesterId], references: [id])
   semesterId  Int
+}
+
+model EventAttendance {
+  id       Int     @id @default(autoincrement())
+  eventId  Int
+  memberId Int
+  event    Event   @relation(fields: [eventId], references: [id])
+  member   Member  @relation(fields: [memberId], references: [id])
 }
