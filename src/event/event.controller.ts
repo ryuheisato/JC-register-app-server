@@ -29,7 +29,7 @@ export class EventController {
     @Param('id') id: string,
     @Body() dto: UpdateEventDto,
   ) {
-    return this.eventService.update(id, semesterId, dto);
+    return this.eventService.update(semesterId, id, dto);
   }
 
   @Delete(':id')

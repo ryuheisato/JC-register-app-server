@@ -22,7 +22,7 @@ model Semester {
 model Member {
   id        Int           @id @default(autoincrement())
   name      String
-  studentID String
+  studentID String?
   semesters SemesterMember[]
   eventsAttended EventAttendance[]
 }
@@ -30,7 +30,7 @@ model Member {
 model SemesterMember {
   semesterId Int
   memberId   Int
-  studentID  String
+  studentID  String?
   semester   Semester @relation(fields: [semesterId], references: [id])
   member     Member   @relation(fields: [memberId], references: [id])
 
@@ -55,4 +55,6 @@ model EventAttendance {
   memberId Int
   event    Event   @relation(fields: [eventId], references: [id])
   member   Member  @relation(fields: [memberId], references: [id])
+
+  @@unique([eventId, memberId])
 }

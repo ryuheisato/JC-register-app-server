@@ -46,13 +46,50 @@ export class SemesterService {
 
   async remove(id: string) {
     try {
-      return await this.prisma.semester.delete({
+      // 1. EventAttendanceを削除
+      const deleteEventAttendances = this.prisma.eventAttendance.deleteMany({
+        where: {
+          event: {
+            semesterId: Number(id),
+          },
+        },
+      });
+
+      // 2. SemesterMembersを削除
+      const deleteSemesterMembers = this.prisma.semesterMember.deleteMany({
+        where: {
+          semesterId: Number(id),
+        },
+      });
+
+      // 3. Eventsを削除
+      const deleteEvents = this.prisma.event.deleteMany({
+        where: {
+          semesterId: Number(id),
+        },
+      });
+
+      // 4. Semesterを削除
+      const deleteSemester = this.prisma.semester.delete({
         where: {
           id: Number(id),
         },
       });
+
+      // 全ての操作を一つのトランザクションとして実行
+      await this.prisma.$transaction([
+        deleteEventAttendances,
+        deleteSemesterMembers,
+        deleteEvents,
+        deleteSemester,
+      ]);
+
+      return {
+        message: 'Semester and related data have been deleted successfully.',
+      };
     } catch (error) {
-      throw new BadRequestException('Failed to delete a semester.');
+      console.error(error);
+      throw new BadRequestException('Failed to delete the semester.');
     }
   }
 }

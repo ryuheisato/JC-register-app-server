@@ -8,7 +8,7 @@ export class CreateEventDto {
   date: string;
 
   @IsString()
-  description: string;
+  description?: string;
 
   @IsNumber()
   semesterId: number;

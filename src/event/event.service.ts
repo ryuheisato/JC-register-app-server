@@ -26,7 +26,7 @@ export class EventService {
         );
       }
 
-      await this.prisma.event.create({
+      return await this.prisma.event.create({
         data: {
           semesterId: Number(semesterId),
           name: dto.name,
@@ -80,6 +80,7 @@ export class EventService {
         },
       });
     } catch (error) {
+      console.error(error);
       throw new BadRequestException('Failed to update a event.');
     }
   }
